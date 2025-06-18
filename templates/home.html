@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero-section text-white py-5 position-relative" style="background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); min-height: 70vh;">
+  <div class="container" data-aos="fade-up">
+    <div class="text-center">
+      <h1 class="display-4 fw-bold mb-3">Welcome to <span class="text-warning">DataHelp.AI</span></h1>
+      <p class="lead mb-4">Upload your dataset and unlock intelligent insights, expert preprocessing suggestions, and an AI chat assistant to answer your data questions — no code required.</p>
+      <a href="/upload_page" class="btn btn-warning btn-lg shadow px-5 py-3">Upload Dataset</a>
+    </div>
+  </div>
+  <div class="floating-icon" style="position: absolute; top: -30px; right: -30px; font-size: 180px; opacity: 0.15;">📊</div>
+</section>
+
+<!-- What is AutoInsight -->
+<br><br>
+<section class="bg-light py-5" data-aos="fade-up">
+  <div class="glass-card shadow-lg p-5 rounded-4">
+    <h2 class="text-primary mb-3">🔍 What is DataHelp.AI?</h2>
+    <p class="fs-6 mb-0">
+      DataHelp.AI is a smart data assistant that uncovers patterns, generates preprocessing suggestions, and lets you chat with your data for deeper understanding. Whether you're a student, analyst, or researcher — it's designed for you, no code required.
+    </p>
+  </div>
+</section>
+<br><br>
+
+<!-- Key Features -->
+<section class="bg-light py-5" data-aos="fade-up">
+  <div class="container">
+    <h2 class="text-center text-primary mb-5">✨ Key Features</h2>
+    <div class="row g-4 text-center">
+      {% set features = [
+        {'icon': 'fa-file-upload', 'title': 'Simple Upload', 'text': 'Upload your CSV file instantly — no formatting needed.', 'color': 'success'},
+        {'icon': 'fa-lightbulb', 'title': 'Data Insights', 'text': 'Understand distributions, missing values, outliers, and patterns.', 'color': 'info'},
+        {'icon': 'fa-comments', 'title': 'Ask About Your Data', 'text': 'Use our chat interface to ask anything about your dataset.', 'color': 'warning'},
+        {'icon': 'fa-tools', 'title': 'Preprocessing Suggestions', 'text': 'Smart tips like encoding, scaling, or column removal.', 'color': 'danger'}
+      ] %}
+      {% for f in features %}
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card p-4 bg-white shadow rounded-4 h-100">
+          <i class="fas {{ f.icon }} fa-2x text-{{ f.color }} mb-3"></i>
+          <h5 class="fw-bold">{{ f.title }}</h5>
+          <p>{{ f.text }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="container py-5" data-aos="fade-up">
+  <h2 class="text-center text-primary mb-5">⚙️ How It Works</h2>
+  <div class="row g-4">
+    {% set steps = [
+      {'icon': 'fa-upload', 'title': 'Step 1: Upload Your Dataset', 'text': 'Drag and drop or choose your CSV file. The system starts analyzing immediately.', 'color': 'success'},
+      {'icon': 'fa-search', 'title': 'Step 2: Explore Data Insights', 'text': 'View key stats like mean, nulls, types, and distributions.', 'color': 'info'},
+      {'icon': 'fa-comments', 'title': 'Step 3: Ask About Your Data', 'text': 'Use our AI chat to ask questions and explore patterns interactively.', 'color': 'warning'},
+      {'icon': 'fa-lightbulb', 'title': 'Step 4: Get Preprocessing Advice', 'text': 'Receive smart recommendations to clean and prepare data.', 'color': 'danger'}
+    ] %}
+    {% for step in steps %}
+    <div class="col-md-6">
+      <div class="p-4 bg-white shadow rounded-4 h-100">
+        <h5><i class="fas {{ step.icon }} text-{{ step.color }} me-2"></i>{{ step.title }}</h5>
+        <p>{{ step.text }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Who It's For -->
+<section class="bg-white py-5" data-aos="fade-up">
+  <div class="container">
+    <h2 class="text-center text-primary mb-4">👥 Who Should Use DataHelp.AI?</h2>
+    <div class="row text-center">
+      {% set users = [
+        {'title': '🧑‍🎓 Students & Beginners', 'text': 'Build foundational data understanding before ML training.'},
+        {'title': '📊 Analysts & Professionals', 'text': 'Quickly interpret business or client datasets for analysis.'},
+        {'title': '🧪 Researchers & Hobbyists', 'text': 'Explore patterns before conducting statistical modeling.'}
+      ] %}
+      {% for user in users %}
+      <div class="col-md-4 mb-4">
+        <div class="p-4 border rounded-4 shadow bg-light h-100">
+          <h5 class="fw-bold">{{ user.title }}</h5>
+          <p>{{ user.text }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Final Call to Action -->
+<section class="bg-dark text-white text-center py-5 mt-5 shadow" data-aos="fade-up">
+  <div class="container">
+    <h2 class="mb-3">🧠 Ready to Chat With Your Data?</h2>
+    <p class="lead">Upload your dataset now and let DataHelp.AI answer your data questions and provide expert suggestions.</p>
+    <a href="/upload_page" class="btn btn-outline-warning btn-lg mt-3 px-4 py-3">Get Started</a>
+  </div>
+</section>
+
+{% endblock %}

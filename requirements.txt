@@ -1,0 +1,7 @@
+flask
+flask-session
+pandas
+python-dotenv
+openai
+langchain
+langchain-community

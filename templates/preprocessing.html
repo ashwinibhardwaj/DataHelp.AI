@@ -1,0 +1,236 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Highlight.js Theme -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+
+<section class="container py-5" data-aos="fade-up">
+  <h2 class="insight-header text-center mb-4">🔧 Preprocessing Suggestions</h2>
+
+  <button class="cta-btn-secondary" onclick="exportPDF()">
+    <i class="bi bi-download me-2"></i>Download as PDF
+  </button><br><br>
+
+  {% if suggestions %}
+  <div class="suggestion-block" id="suggestionContent">
+    {% for block in suggestions %}
+      {% if block.type == 'text' %}
+        <p>{{ block.content | replace('\n\n', '</p><p>') | replace('\n', '<br>') | safe }}</p>
+
+      {% elif block.type == 'code' %}
+        <div class="code-block">
+          <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+          <pre><code class="language-python">{{ block.content | e }}</code></pre>
+        </div>
+
+      {% elif block.type == 'error' %}
+        <div class="alert alert-danger">{{ block.content }}</div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% else %}
+    <div class="alert alert-info text-center shadow-sm mt-4">No suggestions available for this dataset.</div>
+  {% endif %}
+</section>
+
+<!-- Styles -->
+<style>
+/* Buttons */
+.cta-btn, .cta-btn-secondary {
+  font-size: 1.05rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  transition: 0.3s ease;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cta-btn {
+  background: linear-gradient(135deg, #00bcd4, #007d8c);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,188,212,0.4);
+}
+.cta-btn:hover {
+  background: linear-gradient(135deg, #007d8c, #00bcd4);
+  box-shadow: 0 0 12px rgba(0,188,212,0.5);
+}
+
+.cta-btn-secondary {
+  background: #ffffff;
+  color: #007d8c;
+  border: 2px solid #00bcd4;
+}
+.cta-btn-secondary:hover {
+  background: #e0f7fa;
+}
+
+.insight-header {
+  font-size: 2.3rem;
+  font-weight: bold;
+  color: #1a1a2e;
+  letter-spacing: -0.5px;
+}
+
+.suggestion-block {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #333;
+  text-align: justify;
+}
+
+.suggestion-block p {
+  margin-bottom: 1.1rem;
+}
+
+.code-block {
+  position: relative;
+  background: #0f172a;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.08);
+  overflow-x: auto;
+}
+
+.code-block pre {
+  margin: 0;
+  padding: 1rem 1.2rem;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 0.95rem;
+  color: #e2e8f0;
+  line-height: 1.7;
+  background: transparent;
+  white-space: pre;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background-color: #1e293b;
+  border: none;
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+.copy-btn:hover {
+  opacity: 1;
+}
+
+/* PDF Header */
+.pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ccc;
+}
+.pdf-header img {
+  width: 50px;
+  height: auto;
+}
+.pdf-title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #1a237e;
+  text-align: center;
+  flex-grow: 1;
+}
+.pdf-date {
+  font-size: 0.95rem;
+  color: #555;
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .insight-header {
+    font-size: 1.8rem;
+  }
+
+  .suggestion-block {
+    font-size: 1rem;
+    padding: 1.2rem;
+  }
+
+  .pdf-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .pdf-title {
+    text-align: left;
+  }
+}
+</style>
+
+<!-- Scripts -->
+<script>
+function exportPDF() {
+  const suggestionContent = document.getElementById('suggestionContent').cloneNode(true);
+
+  const wrapper = document.createElement('div');
+  const header = document.createElement('div');
+  header.className = "pdf-header";
+
+  const logo = document.createElement('img');
+  logo.src = "../static/asets/favicon.ico";
+  logo.alt = "Logo";
+
+  const title = document.createElement('div');
+  title.className = "pdf-title";
+  title.innerText = "DataHelp.AI - Preprocessing Suggestions";
+
+  const date = document.createElement('div');
+  date.className = "pdf-date";
+  const now = new Date();
+  const formattedDate = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+  date.innerText = formattedDate;
+
+  header.appendChild(logo);
+  header.appendChild(title);
+  header.appendChild(date);
+  wrapper.appendChild(header);
+  wrapper.appendChild(suggestionContent);
+
+  const opt = {
+    margin: 0.5,
+    filename: 'preprocessing_suggestions.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+
+  html2pdf().from(wrapper).set(opt).save();
+}
+
+function copyToClipboard(btn) {
+  const codeElement = btn.nextElementSibling.querySelector('code');
+  const text = codeElement.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerText = "Copied!";
+    setTimeout(() => (btn.innerText = "Copy"), 1500);
+  });
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
+{% endblock %}

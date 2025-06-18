@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid px-2 px-sm-4 w-100 mt-0">
+  <h2 class="mb-4 text-center fs-4 fs-sm-3">💬 Chat With Your Data</h2>
+
+  {% if not session.filename %}
+  <!-- Upload dataset -->
+  <div class="card shadow p-4 mb-5 mx-auto" data-aos="fade-up" style="max-width: 600px;">
+    <h5 class="mb-3 text-center fs-6">📁 Upload a CSV File to Begin</h5>
+    <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+      <div class="mb-3">
+        <input type="file" name="file" accept=".csv" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-success w-100">Upload Dataset</button>
+    </form>
+  </div>
+
+  {% else %}
+  <!-- Chat interface -->
+  <div class="card shadow d-flex flex-column " style="height: 75vh;" data-aos="fade-up">
+
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center p-3 border-bottom small">
+      <span class="text-success text-break mb-2 mb-sm-0">✅ Dataset uploaded: <code>{{ session.filename }}</code></span>
+      <a href="{{ url_for('clear_chat') }}" class="btn btn-sm btn-outline-danger">🧹 Clear Chat</a>
+    </div>
+
+    <!-- Chat messages -->
+    <div id="chat-box" class="flex-grow-1 overflow-auto p-2" style="background-color: #f9f9f9;">
+      {% if chat_history %}
+        {% for chat in chat_history %}
+        <div class="mb-3">
+          <!-- User's question -->
+          <div class="text-end">
+            <div class="d-inline-block text-white p-2 rounded fs-sm-6 fs-7" style="max-width: 100%; word-wrap: break-word; background: #5e91ee;">
+              🧑 {{ chat.question }}
+            </div>
+          </div>
+
+          <!-- AI's answer -->
+          <div class="text-start mt-2">
+            <div class="d-inline-block p-2 rounded fs-sm-6 fs-7" style="max-width: 100%; word-wrap: break-word;background: #f0c96f">
+               <pre class="mb-0" style="white-space: pre-wrap;">🤖{{ chat.answer }}</pre>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Input form -->
+    <div class="p-2 border-top bg-white">
+      <form action="{{ url_for('agent_query') }}" method="POST" id="chatForm">
+        <div class="input-group">
+          <input type="text" name="query" class="form-control" placeholder="Ask a question about your data..." required>
+          <button type="submit" class="btn btn-primary" id="askBtn">
+            <span id="askText">Ask</span>
+            <span id="askSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+  {% endif %}
+</div>
+
+<!-- JS -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('chatForm');
+    const askBtn = document.getElementById('askBtn');
+    const askText = document.getElementById('askText');
+    const askSpinner = document.getElementById('askSpinner');
+    const chatBox = document.getElementById('chat-box');
+
+    if (form) {
+      form.addEventListener('submit', function () {
+        askBtn.disabled = true;
+        askText.textContent = 'Generating...';
+        askSpinner.classList.remove('d-none');
+      });
+    }
+
+    if (chatBox) {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted || (performance && performance.navigation.type === 2)) {
+        window.location.href = "{{ url_for('clear_chat') }}";
+      }
+    });
+  });
+</script>
+
+<!-- Extra mobile tweaks -->
+<style>
+  @media (max-width: 576px) {
+    .fs-sm-6 {
+      font-size: 0.9rem !important;
+    }
+    .fs-7 {
+      font-size: 0.8rem !important;
+    }
+    h2 {
+      font-size: 1.25rem !important;
+    }
+    .card {
+      border-radius: 0.75rem;
+    }
+  }
+</style>
+{% endblock %}

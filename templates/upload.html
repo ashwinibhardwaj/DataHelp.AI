@@ -1,0 +1,164 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Main Upload Section -->
+<div class="container py-5" data-aos="fade-up">
+  <div class="text-center mb-4">
+    <h2 class="text-primary fw-bold">📁 Upload Your Dataset</h2>
+    <p class="text-muted">Upload a <strong>.csv</strong> file for analysis. You can drag & drop or browse manually.</p>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} mt-2">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="card p-4 shadow-lg border-0 rounded-4 mx-auto" style="max-width: 600px;">
+    <!-- Upload Form -->
+    <form id="uploadForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+      <div id="drop-area" class="drop-zone bg-light rounded-4 p-4 text-center mb-3">
+        <p class="mb-3 text-dark fs-6">Drag & drop your CSV file here or</p>
+        <input type="file" id="fileInput" name="file" accept=".csv" class="form-control" required>
+        <p id="fileName" class="fw-semibold text-success small mt-2">{{ filename if filename else '' }}</p>
+      </div>
+
+      <button type="submit" class="btn btn-success w-100 py-2">
+        <i class="bi bi-upload me-1"></i> Upload Dataset
+      </button>
+    </form>
+
+    <!-- Feedback messages and next action buttons -->
+    {% if success %}
+    <div class="alert alert-success mt-4 text-center">{{ success }}</div>
+
+    <div class="row g-3 mt-2">
+      <div class="col-12 col-md-6">
+        <form action="{{ url_for('analyze') }}" method="POST" onsubmit="showLoader()">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-graph-up me-1"></i> Get Insights
+          </button>
+        </form>
+      </div>
+      <div class="col-12 col-md-6">
+        <a href="{{ url_for('chat_page') }}" class="btn btn-info w-100">
+          <i class="bi bi-chat-dots me-1"></i> Chat With Data
+        </a>
+      </div>
+    </div>
+
+    {% elif error %}
+    <div class="alert alert-danger mt-4 text-center">{{ error }}</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Loader -->
+<div id="preloader" style="display: none;">
+  <div class="glow-loader">
+    <div class="glow-ring"></div>
+    <h3 class="glow-text">Please Wait...</h3>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script>
+  document.getElementById('fileInput').addEventListener('change', function () {
+    const fileName = this.files[0]?.name || '';
+    document.getElementById('fileName').textContent = fileName;
+  });
+
+  function showLoader() {
+    document.getElementById('preloader').style.display = 'flex';
+  }
+</script>
+
+<!-- Styles -->
+<style>
+/* Drop Area */
+.drop-zone {
+  border: 2px dashed #0d6efd;
+  transition: background 0.3s, border-color 0.3s;
+}
+.drop-zone:hover {
+  background: #e7f1ff;
+  border-color: #0b5ed7;
+}
+
+/* Loader Styling */
+#preloader {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.9), rgba(10, 10, 10, 0.95));
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.glow-loader {
+  text-align: center;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.glow-ring {
+  width: 100px;
+  height: 100px;
+  border: 6px solid #00ffff60;
+  border-top-color: #00ffff;
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite, glowPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 20px #00ffffaa;
+  margin: auto;
+}
+
+.glow-text {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff99;
+  letter-spacing: 1.2px;
+  animation: glowTextPulse 2s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px #00ffffaa; }
+  50% { box-shadow: 0 0 35px #00ffffee; }
+}
+
+@keyframes glowTextPulse {
+  0%, 100% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff88; }
+  50% { text-shadow: 0 0 15px #00ffff, 0 0 30px #00ffffcc; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive Enhancements */
+@media (max-width: 576px) {
+  h2.text-primary {
+    font-size: 1.5rem;
+  }
+
+  .glow-text {
+    font-size: 1rem;
+  }
+
+  .drop-zone {
+    padding: 2rem 1rem;
+  }
+}
+</style>
+
+{% endblock %}

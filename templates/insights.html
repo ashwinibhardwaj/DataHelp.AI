@@ -1,0 +1,228 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<section class="container py-5" data-aos="fade-up">
+  <h2 class="insight-header text-center mb-5">📊 AI-Generated Insights</h2>
+
+  <!-- Action Buttons -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <button class="cta-btn-secondary" onclick="downloadInsightsPDF()">
+      <i class="bi bi-download me-2"></i>Download as PDF
+    </button>
+
+    <form id="uploadForm" action="{{ url_for('preprocess_suggestions') }}" method="POST" enctype="multipart/form-data" class="mb-3 mb-md-0">
+      <textarea name="insights" hidden>{{ insights }}</textarea>
+      <textarea name="data_info" hidden>{{ data_info | tojson }}</textarea>
+      <textarea name="filename" hidden>{{ filename | tojson }}</textarea>
+
+      <button type="submit" class="cta-btn me-3">
+        <i class="bi bi-gear-fill me-2"></i> Generate Preprocessing Suggestions
+      </button>
+    </form>
+  </div>
+
+  <!-- Insights Content -->
+  <div id="insightContent" class="insight-block shadow-sm rounded p-4 bg-white">
+    {% for block in insights.split('\n\n') %}
+      <p class="insight-item">
+        <strong class="text-primary">Insight {{ loop.index }}:</strong> <br>
+        {{ block | replace('\n', '<br>') | safe }}
+      </p>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Preloader -->
+<div id="preloader" style="display: none;">
+  <div class="glow-loader">
+    <div class="glow-ring"></div>
+    <h3 class="glow-text">Generating Suggestions...</h3>
+  </div>
+</div>
+
+<!-- Styles -->
+<style>
+body {
+  background-color: #f4f7fb;
+}
+
+.insight-header {
+  font-size: 2.3rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  letter-spacing: -0.5px;
+}
+
+.insight-block {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 1.075rem;
+  line-height: 1.85;
+  color: #1b1f23;
+  text-align: justify;
+}
+
+.insight-item {
+  margin-bottom: 2rem;
+}
+
+/* Buttons */
+.cta-btn, .cta-btn-secondary {
+  font-size: 1.05rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  transition: 0.3s ease;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cta-btn {
+  background: linear-gradient(135deg, #00bcd4, #007d8c);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,188,212,0.4);
+}
+.cta-btn:hover {
+  background: linear-gradient(135deg, #007d8c, #00bcd4);
+  box-shadow: 0 0 12px rgba(0,188,212,0.5);
+}
+
+.cta-btn-secondary {
+  background: #ffffff;
+  color: #007d8c;
+  border: 2px solid #00bcd4;
+}
+.cta-btn-secondary:hover {
+  background: #e0f7fa;
+}
+
+/* Preloader */
+#preloader {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.9), rgba(10, 10, 10, 0.95));
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.glow-loader {
+  text-align: center;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.glow-ring {
+  width: 100px;
+  height: 100px;
+  border: 6px solid #00ffff60;
+  border-top-color: #00ffff;
+  border-radius: 50%;
+  animation: spin 1.2s linear infinite, glowPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 20px #00ffffaa;
+  margin: auto;
+}
+
+.glow-text {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  color: #00ffff;
+  text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff99;
+  letter-spacing: 1.2px;
+  animation: glowTextPulse 2s ease-in-out infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px #00ffffaa; }
+  50% { box-shadow: 0 0 35px #00ffffee; }
+}
+
+@keyframes glowTextPulse {
+  0%, 100% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff88; }
+  50% { text-shadow: 0 0 15px #00ffff, 0 0 30px #00ffffcc; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+
+.pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ccc;
+}
+.pdf-header img {
+  width: 50px;
+  height: auto;
+}
+.pdf-title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #1a237e;
+  text-align: center;
+  flex-grow: 1;
+}
+.pdf-date {
+  font-size: 0.95rem;
+  color: #555;
+  font-style: italic;
+}
+</style>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+<script>
+function downloadInsightsPDF() {
+  const content = document.getElementById('insightContent').cloneNode(true);
+
+  const wrapper = document.createElement('div');
+  const header = document.createElement('div');
+  header.className = "pdf-header";
+
+  const logo = document.createElement('img');
+  logo.src = "../static/asets/favicon.ico";
+  logo.alt = "Logo";
+  logo.style.width = "50px";
+
+  const title = document.createElement('div');
+  title.className = "pdf-title";
+  title.innerText = "DataHelp.AI - AI Generated Insights";
+
+  const date = document.createElement('div');
+  date.className = "pdf-date";
+  const now = new Date();
+  const formattedDate = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+  date.innerText = formattedDate;
+
+
+  header.appendChild(logo);
+  header.appendChild(title);
+  header.appendChild(date);
+
+  wrapper.appendChild(header);
+  wrapper.appendChild(content);
+
+  const opt = {
+    margin: 0.5,
+    filename: 'ai_generated_insights.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+
+  html2pdf().from(wrapper).set(opt).save();
+}
+</script>
+
+{% endblock %}
