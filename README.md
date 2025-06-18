@@ -18,8 +18,9 @@
 
 - Python 
 - Flask
-- LangChain
-- OpenRouter LLM (like GPT-3.5-turbo)
+- LLM Provider: Groq Cloud
+- Model Used: mixtral-8x7b (Mistral/Mixtral instruct model)
+- Interface: LangChain + LangChain Community integrations
 - Bootstrap (for frontend)
 - Railway (for deployment)
 
