@@ -1,8 +1,4 @@
 # DataHelp.AI
-An intelligent AI-powered assistant that lets you chat with your uploaded CSV files and get AI generated insights. Built using Flask, LangChain, and OpenRouter for seamless data-driven insights.
-
-
-# DataHelp.AI
 
 **DataHelp.AI** is a smart assistant that allows users to upload CSV datasets and interact with them using natural language queries. Powered by **LangChain**, **OpenRouter LLMs**, and **Flask**, the app helps you uncover insights, metadata, preprocessing suggestions, and chat-based analytics — all through a simple interface.
 
