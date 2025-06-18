@@ -2,6 +2,8 @@ flask
 flask-session
 pandas
 python-dotenv
-openai
+
+# LangChain core and ecosystem
 langchain
 langchain-community
+langchain-groq
