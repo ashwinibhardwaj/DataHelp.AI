@@ -1,11 +1,12 @@
 # agents/prep_agent.py
+
 import os
 import re
-from langchain_community.chat_models import ChatOpenAI
+from langchain_groq import ChatGroq
 from langchain.schema import HumanMessage
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv()  # Load environment variables from .env
 
 def generate_preprocessing_guide(data_info, insights):
     prompt = f"""
@@ -24,10 +25,11 @@ def generate_preprocessing_guide(data_info, insights):
     {insights}
     """
 
-    llm = ChatOpenAI(
-        base_url="https://openrouter.ai/api/v1",
-        api_key=os.getenv("OPENROUTER_API_KEY"),
-        model="mistralai/mistral-7b-instruct"
+    # Use Groq's LLaMA 3 model
+    llm = ChatGroq(
+        temperature=0,
+        model_name="llama3-8b-8192",
+        api_key=os.getenv("GROQ_API_KEY")
     )
 
     try:
@@ -36,14 +38,12 @@ def generate_preprocessing_guide(data_info, insights):
 
         # Split into descriptions and code blocks
         segments = re.split(r"```(?:python)?\n(.*?)```", text, flags=re.DOTALL)
-        
+
         result = []
         for i, segment in enumerate(segments):
             if i % 2 == 0:
-                # Text segment
                 result.append({"type": "text", "content": segment.strip()})
             else:
-                # Code segment
                 result.append({"type": "code", "content": segment.strip()})
 
         return result

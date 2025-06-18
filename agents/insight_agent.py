@@ -1,6 +1,7 @@
 # agents/insight_agent.py
+
 import os
-from langchain_community.chat_models import ChatOpenAI
+from langchain_groq import ChatGroq
 from langchain.schema import HumanMessage
 from dotenv import load_dotenv
 
@@ -17,10 +18,10 @@ def generate_insights(data_info):
     {data_info}
     """
 
-    llm = ChatOpenAI(
-        base_url="https://openrouter.ai/api/v1",
-        api_key=os.getenv("OPENROUTER_API_KEY"),
-        model="mistralai/mistral-7b-instruct"
+    llm = ChatGroq(
+        temperature=0,
+        model_name="llama3-8b-8192",
+        api_key=os.getenv("GROQ_API_KEY")
     )
 
     try:
