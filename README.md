@@ -16,7 +16,7 @@
 
 ## 🛠️ Tech Stack
 
-- Python 🐍
+- Python 
 - Flask
 - LangChain
 - OpenRouter LLM (like GPT-3.5-turbo)
