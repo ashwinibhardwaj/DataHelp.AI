@@ -21,7 +21,7 @@
 - LangChain
 - OpenRouter LLM (like GPT-3.5-turbo)
 - Bootstrap (for frontend)
-- Vercel (for deployment)
+- Railway (for deployment)
 
 ---
 
